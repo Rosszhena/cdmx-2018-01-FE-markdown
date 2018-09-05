@@ -15,7 +15,10 @@ const readFile = (callback) => {
    fs.readFile(callback,function(err,md){
        if(err){ console.log(err);}
         
+      // console.log(marked(md.toString()))
+       //console.log(md.toString())
       marked(md.toString(), {//Se covierte el archivo md a html
+        
           renderer: getLink() //Se invoca la función que obtiene los links del archivo md
         }) 
         })
@@ -23,11 +26,13 @@ const readFile = (callback) => {
 
 // return a custom renderer for marked.
 getLink = function () {
+   
     var render = new marked.Renderer();
     render.link = function (href, title, text) {
  
-      // console.log(text + ' ( link to: ' + href + ' )')
-       console.log(render)
+        let arrLink = [`{links: "${href}", text: "${text}" }`]
+     //console.log(text + ' ( link to: ' + href + ' )')
+      console.log(arrLink)
         return text + ' ( link to: ' + href + ' )';
     };
  

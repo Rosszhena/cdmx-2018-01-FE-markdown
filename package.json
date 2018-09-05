@@ -19,6 +19,7 @@
   "keywords": [],
   "dependencies": {
     "eslint": "^5.4.0",
+    "fs-cheerio": "^2.0.1",
     "marked": "^0.5.0",
     "marked-terminal": "^3.1.1"
   }
