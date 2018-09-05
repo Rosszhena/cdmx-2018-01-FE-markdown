@@ -2,35 +2,36 @@ const fs = require("fs");
 const path = require("path");// nombre de la variable igual que el nombre del modulo 
 const marked = require('marked');
 
-const mdLink = (file) => {
-     if(path.isAbsolute(file)!=true){
-        //console.log("Es falso")
-        let fileAbsolut = path.resolve(file)
-        console.log("prueba "+fileAbsolut)
-     }
+//Funcion que valida la ruta si es relativa o absoluta
+const validateLink = (route) =>{
+    if(path.isAbsolute(route)!=true){
+        let fileAbsolut = path.resolve(route)
+        return fileAbsolut}
+    else return route 
+}
 
-   fs.readFile(file,function(err,md){
-       if(err){
-            console.log(err);
-        }
-        marked(md.toString(), {renderer: render_unlink()})
+//Funcion leer archivo md
+const readFile = (callback) => {
+   fs.readFile(callback,function(err,md){
+       if(err){ console.log(err);}
+        
+      marked(md.toString(), {//Se covierte el archivo md a html
+          renderer: getLink() //Se invoca la función que obtiene los links del archivo md
+        }) 
         })
     }
 
-    mdLink("./src/ux/README.md")
-
 // return a custom renderer for marked.
-render_unlink = function () {
- 
+getLink = function () {
     var render = new marked.Renderer();
- 
     render.link = function (href, title, text) {
  
-        console.log("href: " + href +  " text " +text)
+      // console.log(text + ' ( link to: ' + href + ' )')
+       console.log(render)
         return text + ' ( link to: ' + href + ' )';
     };
  
     return render; 
 };
 
-
+readFile("./src/ux/README.md")
