@@ -1,9 +1,10 @@
 const fs = require('fs'); 
 const path = require('path');// nombre de la variable igual que el nombre del modulo 
 const marked = require('marked');
+const fetch = require('node-fetch');
 
 // Funcion que valida la ruta si es relativa o absoluta
-const validateLink = (route) =>{
+const validateRoute = (route) =>{
   if (path.isAbsolute(route) != true) {
     let fileAbsolut = path.resolve(route);
     return fileAbsolut;
@@ -11,33 +12,71 @@ const validateLink = (route) =>{
 };
 
 // Funcion leer archivo md
-const readFile = (callback) => {
-  fs.readFile(callback, function(err, md) {
+const readFile = (fileName) => {
+  fs.readFile(fileName, function(err, md) {
     if (err) {
       console.log(err);
     }
-        
-    // console.log(marked(md.toString()))
-    // console.log(md.toString())
-    marked(md.toString(), {// Se covierte el archivo md a html
-        
-      renderer: getLink() // Se invoca la función que obtiene los links del archivo md
+    const arregloLinks = [];
+    marked(md.toString(), {// Se covierte el archivo md a htm
+      renderer: getLink(arregloLinks) // Se invoca la función que obtiene los links del archivo md   
     }); 
+    // console.log(arregloLinks);
+     validateUrl(arregloLinks);
   });
 };
 
 // return a custom renderer for marked.
-getLink = function() {
-  let arrLink = [];
-  var render = new marked.Renderer();
+getLink = function(arregloLinks) {
+  let obj = {};
+
+  let render = new marked.Renderer();
   render.link = function(href, title, text) {
-    let obj = {links: href, text: text};
-    arrLink.push(obj)
-    console.log(arrLink);
-    return text + ' ( link to: ' + href + ' )';
-  };
+    obj = {
+      links: href, 
+      text: text
+    };
+    arregloLinks.push(obj);
+    return obj;
+    // arrLink.push(obj);
+   
+    // obj = {
+    //   links: href, 
+    //   text: text,
+      
+    // }
+    // return arrLink;
+  //  return text + ' ( link to: ' + href + ' )';
+  }; 
   return render; 
 };
 
-readFile('./src/ux/README.md');
+const validateUrl = (array) => {
+  let mypromesas = [];
+  array.forEach(function(element, index) {
+   mypromesas.push(new Promise((resolve, reject) => {
+      fetch(element.links).then(res => {
+          element.status = res.status;
+          element.statusText = res.statusText;
+          resolve( element);
+        }).catch(err => {
+          element.status = err.code;
+         resolve( element);
+        });
+    }));
+    
+  });
 
+  Promise.all(mypromesas).then(values => { 
+    console.log(values);
+  }).catch(reason => { 
+    console.log(reason);
+  });
+
+ 
+};
+
+
+readFile('./README.md');
+
+module.exports = {validateRoute};
