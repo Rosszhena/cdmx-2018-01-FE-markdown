@@ -21,16 +21,15 @@ const readFile = (fileName) => {
     marked(md.toString(), {// Se covierte el archivo md a htm
       renderer: getLink(arregloLinks) // Se invoca la función que obtiene los links del archivo md   
     }); 
-    // console.log(arregloLinks);
-     validateUrl(arregloLinks);
+    validateUrl(arregloLinks);
   });
 };
 
-// return a custom renderer for marked.
+
 getLink = function(arregloLinks) {
   let obj = {};
-
   let render = new marked.Renderer();
+
   render.link = function(href, title, text) {
     obj = {
       links: href, 
@@ -38,15 +37,6 @@ getLink = function(arregloLinks) {
     };
     arregloLinks.push(obj);
     return obj;
-    // arrLink.push(obj);
-   
-    // obj = {
-    //   links: href, 
-    //   text: text,
-      
-    // }
-    // return arrLink;
-  //  return text + ' ( link to: ' + href + ' )';
   }; 
   return render; 
 };
@@ -54,17 +44,16 @@ getLink = function(arregloLinks) {
 const validateUrl = (array) => {
   let mypromesas = [];
   array.forEach(function(element, index) {
-   mypromesas.push(new Promise((resolve, reject) => {
+    mypromesas.push(new Promise((resolve, reject) => {
       fetch(element.links).then(res => {
-          element.status = res.status;
-          element.statusText = res.statusText;
-          resolve( element);
-        }).catch(err => {
-          element.status = err.code;
-         resolve( element);
-        });
+        element.status = res.status;
+        element.statusText = res.statusText;
+        resolve(element);
+      }).catch(err => {
+        element.status = err.code;
+        resolve(element);
+      });
     }));
-    
   });
 
   Promise.all(mypromesas).then(values => { 
@@ -72,11 +61,7 @@ const validateUrl = (array) => {
   }).catch(reason => { 
     console.log(reason);
   });
-
- 
 };
 
-
 readFile('./README.md');
-
 module.exports = {validateRoute};
