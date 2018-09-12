@@ -1,12 +1,12 @@
-const {validateLink } = require('../index.js');
+const {validateRoute, readFile} = require('../index.js');
 
-describe('validateLink', () => {
-    test('Debería validateLink ser una función', () => {
-        expect(typeof validateLink).toEqual('function');
+describe('validateRoute', () => {
+    test('Debería validateRoute ser una función', () => {
+        expect(typeof validateRoute).toEqual('function');
     });
     
-    test('Debería validateLink ser una función', () => {
-      expect(typeof validateLink).toEqual('function');
+    test('Debería readFile ser una función', () => {
+      expect(typeof readFile).toEqual('function');
   });
   });
     /*

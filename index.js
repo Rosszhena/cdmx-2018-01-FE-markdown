@@ -64,4 +64,7 @@ const validateUrl = (array) => {
 };
 
 readFile('./README.md');
-module.exports = {validateRoute};
+module.exports = {
+  validateRoute,
+  readFile 
+};
