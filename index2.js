@@ -3,31 +3,26 @@ const path = require('path');// nombre de la variable igual que el nombre del mo
 const marked = require('marked');
 const fetch = require('node-fetch');
 
-// Funcion que convierte rutas relativas en absolutas
-function validateRoute(route) {
-  return new Promise(function(resolve, reject) {
-    resolve(fileName = path.resolve(route));
-  });
-}
+// Funcion que valida la ruta si es relativa o absoluta
+const validateRoute = (route) =>{
+    let fileAbsolut = path.resolve(route);
+    return fileAbsolut; 
+};
 
 // Funcion leer archivo md
-function readFile(fileName) {
-  return new Promise(function(resolve, reject) {
-    fs.readFile(fileName, function(err, md) {
-      resolve(md);
-    });
-  });
-}
-
-function convertMd(md) {
-  return new Promise(function(resolve, reject) {
+const readFile = (fileName) => {
+  fs.readFile(fileName, function(err, md) {
+    if (err) {
+      console.log(err);
+    }
     const arregloLinks = [];
     marked(md.toString(), {// Se covierte el archivo md a htm
       renderer: getLink(arregloLinks) // Se invoca la función que obtiene los links del archivo md   
     }); 
-    resolve(arregloLinks);
+    validateUrl(arregloLinks);
   });
-}
+};
+
 
 getLink = function(arregloLinks) {
   let obj = {};
@@ -60,21 +55,13 @@ const validateUrl = (array) => {
   });
 
   Promise.all(mypromesas).then(values => { 
-    console.log(values);
+    //console.log(values);
   }).catch(reason => { 
     console.log(reason);
   });
 };
 
-validateRoute('./README.md')
-  .then(route => readFile(fileName))
-  .then(md => convertMd(md))
-  .then(arregloLinks => validateUrl(arregloLinks))
-  .catch(err => {
-    console.log('Ocurrio un error', err);
-  });
-
-
+readFile('./README.md');
 module.exports = {
   validateRoute,
   readFile 
