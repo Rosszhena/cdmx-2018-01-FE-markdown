@@ -14,29 +14,33 @@ function validateRoute(route) {
 function readFile(fileName) {
   return new Promise(function(resolve, reject) {
     fs.readFile(fileName, function(err, md) {
-      resolve(md);
+      if (err) {
+        return reject(err);
+      }
+      resolve(md, fileName); 
     });
   });
 }
 
-function convertMd(md) {
+function convertMd(md, fileName) {
+  //console.log(fileName)
   return new Promise(function(resolve, reject) {
     const arregloLinks = [];
     marked(md.toString(), {// Se covierte el archivo md a htm
-      renderer: getLink(arregloLinks) // Se invoca la función que obtiene los links del archivo md   
-    }); 
+      renderer: getLink(arregloLinks, fileName) // Se invoca la función que obtiene los links del archivo md   
+    });
     resolve(arregloLinks);
   });
 }
 
-getLink = function(arregloLinks) {
+getLink = function(arregloLinks, fileName) {
   let obj = {};
   let render = new marked.Renderer();
-
   render.link = function(href, title, text) {
     obj = {
       links: href, 
-      text: text
+      text: text,
+      route: fileName
     };
     arregloLinks.push(obj);
     return obj;
@@ -44,7 +48,7 @@ getLink = function(arregloLinks) {
   return render; 
 };
 
-const validateUrl = (array) => {
+function validateUrl(array) {
   let mypromesas = [];
   array.forEach(function(element, index) {
     mypromesas.push(new Promise((resolve, reject) => {
@@ -54,21 +58,23 @@ const validateUrl = (array) => {
         resolve(element);
       }).catch(err => {
         element.status = err.code;
+        element.statusText = "fail";
         resolve(element);
       });
     }));
   });
 
   Promise.all(mypromesas).then(values => { 
-    console.log(values);
+   console.log(values);
   }).catch(reason => { 
     console.log(reason);
   });
+
 };
 
 validateRoute('./README.md')
   .then(route => readFile(fileName))
-  .then(md => convertMd(md))
+  .then(md => convertMd(md, fileName))
   .then(arregloLinks => validateUrl(arregloLinks))
   .catch(err => {
     console.log('Ocurrio un error', err);
@@ -77,5 +83,7 @@ validateRoute('./README.md')
 
 module.exports = {
   validateRoute,
-  readFile 
+  readFile,
+  convertMd,
+  validateUrl
 };
